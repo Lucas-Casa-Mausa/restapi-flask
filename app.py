@@ -15,8 +15,6 @@ class User(Resource):
         return {"message":"CPF"}
     
 
-    
-
 api.add_resource(Users,'/users')
 api.add_resource(User,'/user','/user/<string:cpf>')
 
