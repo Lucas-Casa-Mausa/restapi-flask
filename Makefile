@@ -4,7 +4,7 @@ VENV = .venv
 # Remember to Install Flake8 at your venv
 
 test:
-	@$(VENV)/Scripts/flake8 app.py
+	@$(VENV)/Scripts/flake8 . --exclude .venv
 
 compose:
 	@docker-compose build

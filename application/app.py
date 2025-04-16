@@ -1,7 +1,8 @@
-from flask import Flask, jsonify
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
 import re
+from application.model import UserModel
 
 
 _user_parser = reqparse.RequestParser()
@@ -87,5 +88,3 @@ class User(Resource):
             return jsonify(response)
 
         return {"message": "User does not exist in database"}, 400
-
-
