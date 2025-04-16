@@ -8,12 +8,14 @@ services:
       MONGO_INITDB_ROOT_USERNAME:admin
       MONGO_INITDB_ROOT_PASSWORD:admin
     restart: always
-    
+
   api:
     build:
       context: .
     ports:
       - 5000:5000
+    environment:
+      - FLASK_ENV=development
     restart: always
     depends_on:
       - mongodb

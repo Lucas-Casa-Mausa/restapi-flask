@@ -1,17 +1,7 @@
 from flask import Flask, jsonify
-from flask_restful import Resource, Api, reqparse
-from flask_mongoengine import MongoEngine
+from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
 import re
-
-app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'users',
-    'host': 'mongodb',
-    'port': '27017',
-    'username': 'admin',
-    'password': 'admin',
-}
 
 
 _user_parser = reqparse.RequestParser()
@@ -40,17 +30,6 @@ _user_parser.add_argument('email',
                           required=True,
                           help='This Field cannot be blank'
                           )
-
-api = Api(app)
-db = MongoEngine(app)
-
-
-class UserModel(db.Document):
-    email = db.EmailField(required=True)
-    first_name = db.StringField(required=True)
-    last_name = db.StringField(required=True)
-    cpf = db.StringField(required=True, unique=True)
-    birthday = db.DateTimeField(required=True)
 
 
 class Users(Resource):
@@ -93,20 +72,20 @@ class User(Resource):
         data = _user_parser.parse_args()
 
         if not self.validate_cpf(data["cpf"]):
-            return {"message":"CPF is invalid"}
+            return {"message": "CPF is invalid"}
 
         try:
             response = UserModel(**data).save()
-            return {"message":"User %s sucessfully created!" % response.id}
+            return {"message": "User %s sucessfully created!" % response.id}
         except NotUniqueError:
-            return {"message":"CPF already exists in database"},400
+            return {"message": "CPF already exists in database"}, 400
 
-    def get(self):
-        return {"message": "CPF"}
+    def get(self, cpf):
+        response = UserModel.objects(cpf=cpf)
+
+        if response:
+            return jsonify(response)
+
+        return {"message": "User does not exist in database"}, 400
 
 
-api.add_resource(Users, '/users')
-api.add_resource(User, '/user', '/user/<string:cpf>')
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True)
