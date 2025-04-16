@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from flask_mongoengine import MongoEngine
-# from mongoengine import Document,StringField
 
 
 app = Flask(__name__)
@@ -13,6 +12,33 @@ app.config['MONGODB_SETTINGS'] = {
     'password': 'admin',
 }
 
+
+_user_parser = reqparse.RequestParser()
+_user_parser.add_argument('first_name',
+                          type=str,
+                          required=True,
+                          help='This Field cannot be blank'
+                          )
+_user_parser.add_argument('last_name',
+                          type=str,
+                          required=True,
+                          help='This Field cannot be blank'
+                          )
+_user_parser.add_argument('cpf',
+                          type=str,
+                          required=True,
+                          help='This Field cannot be blank'
+                          )
+_user_parser.add_argument('birth_date',
+                          type=str,
+                          required=True,
+                          help='This Field cannot be blank'
+                          )
+_user_parser.add_argument('email',
+                          type=str,
+                          required=True,
+                          help='This Field cannot be blank'
+                          )
 
 api = Api(app)
 db = MongoEngine(app)
@@ -29,10 +55,15 @@ class UserModel(db.Document):
 class Users(Resource):
     def get(self):
         return jsonify(UserModel.objects())
-        # return {"message":"User 1"}
+
 
 
 class User(Resource):
+    def post(self):
+        data = _user_parser.parse_args()
+        UserModel(**data).save()
+
+
     def get(self):
         return {"message": "CPF"}
 
