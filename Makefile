@@ -5,7 +5,9 @@ VENV = .venv
 
 test:
 	@$(VENV)/Scripts/flake8 . --exclude .venv
+	@$(VENV)/Scripts/pytest -v --disable-warnings
 
 compose:
 	@docker-compose build
 	@docker-compose up
+
