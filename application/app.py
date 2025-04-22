@@ -41,28 +41,27 @@ class Users(Resource):
 class User(Resource):
 
     def validate_cpf(self, cpf):
-
-        # Has the correct mask?
-        if not re.match(r'\d{3}\.\d{3}\.\d{3}\.\d{2}', cpf):
+        # Verifica a formatação (opcional, dependendo do uso)
+        if not re.match(r'^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$', cpf):
             return False
 
-        # Grap only numbers
+        # Extrai apenas os dígitos
         numbers = [int(digit) for digit in cpf if digit.isdigit()]
 
-        # Does it have 11 digits?
-        if len(numbers) != 11 or len(set(numbers)) == 1:
+        # Verifica tamanho e sequências inválidas
+        if len(numbers) != 11 or numbers == numbers[::-1]:
             return False
 
-        # Validate first digit after -
-        sum_of_products = sum(a*b for a, b in zip(numbers[0:9],
-                                                  range(10, 1, -1)))
+        # Validação do primeiro dígito verificador
+        sum_of_products = sum(a * b for a, b in zip(numbers[0:9],
+                                                    range(10, 1, -1)))
         expected_digit = (sum_of_products * 10 % 11) % 10
         if numbers[9] != expected_digit:
             return False
 
-        # Validate second digit after -
-        sum_of_products = sum(a*b for a, b in zip(numbers[0:10],
-                                                  range(11, 1, -1)))
+        # Validação do segundo dígito verificador
+        sum_of_products = sum(a * b for a, b in zip(numbers[0:10],
+                                                    range(11, 1, -1)))
         expected_digit = (sum_of_products * 10 % 11) % 10
         if numbers[10] != expected_digit:
             return False
