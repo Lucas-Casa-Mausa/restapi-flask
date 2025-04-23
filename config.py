@@ -1,6 +1,11 @@
 import os
 
 
+"""senha JxGG2a9pcUsolSb6@firstdb
+host firstdb.4tf1rjz.mongodb.net
+"""
+
+
 class DevConfig():
 
     MONGODB_SETTINGS = {
@@ -11,7 +16,20 @@ class DevConfig():
     }
 
 
-class MockConfig:
+class ProdConfig():
+
+    MONGODB_USER = os.getenv('MONGODB_USER')
+    MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
+    MONGODB_HOST = os.getenv("MONGODB_HOST")
+    MONGODB_DB = os.getenv("MONGODB_DB")
+
+    MONGODB_SETTINGS = {
+        'host': f'mongodb+srv://{MONGODB_USER}:{MONGODB_PASSWORD}'
+        f'@{MONGODB_HOST}?retryWrites=true&w=majority&appName={MONGODB_DB}'
+    }
+
+
+class MockConfig():
 
     MONGODB_SETTINGS = {
         'db': "users",
