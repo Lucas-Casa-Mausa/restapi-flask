@@ -1,11 +1,6 @@
 import os
 
 
-"""senha JxGG2a9pcUsolSb6@firstdb
-host firstdb.4tf1rjz.mongodb.net
-"""
-
-
 class DevConfig():
 
     MONGODB_SETTINGS = {
