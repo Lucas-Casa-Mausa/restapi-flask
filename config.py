@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+from urllib.parse import quote_plus
+
+
+load_dotenv()
 
 
 class DevConfig():
@@ -13,20 +18,25 @@ class DevConfig():
 
 class ProdConfig():
 
-    MONGODB_USER = os.getenv('MONGODB_USER')
-    MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
-    MONGODB_HOST = os.getenv("MONGODB_HOST")
-    MONGODB_DB = os.getenv("MONGODB_DB")
-
+    MONGODB_USERNAME = os.getenv("MONGO_USERNAME")
+    MONGODB_PASSWORD = quote_plus(
+        os.getenv("MONGO_PASSWORD"))
+    MONGODB_CLUSTER = os.getenv("MONGO_CLUSTER")
+    MONGODB_DB = os.getenv("MONGO_DB")
+    MONGODB_QUERY_PARAMS = os.getenv("MONGO_QUERY_PARAMS")
     MONGODB_SETTINGS = {
-        'host': f'mongodb+srv://{MONGODB_USER}:{MONGODB_PASSWORD}'
-        f'@{MONGODB_HOST}?retryWrites=true&w=majority&appName={MONGODB_DB}'
+        'host': f"mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@"
+        f"{MONGODB_CLUSTER}/{MONGODB_DB}?{MONGODB_QUERY_PARAMS}"
     }
 
 
-class MockConfig():
-
+class MockConfig:
+    TESTING = True
     MONGODB_SETTINGS = {
-        'db': "users",
-        'host': "mongomock://localhost",
+        'db': 'users',
+        'host': 'mongodb://localhost',
+        'mongo_client_class': 'mongomock.MongoClient',
+        'alias': 'default',
+        'connect': False,
+        'uuidRepresentation': 'standard'
     }
