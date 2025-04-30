@@ -24,7 +24,6 @@ class ProdConfig():
     }
 
 
-
 class MockConfig():
 
     MONGODB_SETTINGS = {
