@@ -1,7 +1,7 @@
 import pytest
 from application import create_app
 from application.db import db
-from datetime import datetime, timezone
+from urllib.parse import quote
 
 
 class TestApplication():
@@ -22,7 +22,7 @@ class TestApplication():
             "last_name": "casa Mausa",
             "cpf": "809.561.830-69",
             "email": "teste1234@gmail.com",
-            "birth_date": "1999-12-10"
+            "birth_date": "1999-12-10T00:00:00Z"
                 }
 
     @pytest.fixture
@@ -32,7 +32,7 @@ class TestApplication():
             "last_name": "casa Mausa",
             "cpf": "809.561.830-68",
             "email": "teste1234@gmail.com",
-            "birth_date": "1999-12-10"
+            "birth_date": "1999-12-10T00:00:00Z"
                 }
 
     def test_get_users(self, client):
@@ -41,7 +41,7 @@ class TestApplication():
 
     def test_post_user(self, client, valid_user, invalid_user):
         response = client.post('/user', json=valid_user)
-        assert response.status_code == 200
+        assert response.status_code == 201
         assert b"successfully" in response.data
 
         response = client.post('/user', json=invalid_user)
@@ -50,20 +50,19 @@ class TestApplication():
 
     def test_get_user(self, client, valid_user, invalid_user):
         post_resp = client.post('/user', json=valid_user)
-        assert post_resp.status_code == 200
+        assert post_resp.status_code == 201
 
-        response = client.get('/user/%s' % valid_user["cpf"])
+        encoded_cpf = quote(valid_user["cpf"])
+        response = client.get(f'/user/{encoded_cpf}')
         assert response.status_code == 200
-        assert response.json[0]["first_name"] == "lucas"
-        assert response.json[0]["last_name"] == "casa Mausa"
-        assert response.json[0]["cpf"] == "809.561.830-69"
-        assert response.json[0]["email"] == "teste1234@gmail.com"
 
-        birth_ts = response.json[0]["birth_date"]["$date"]
-        birth_date = (datetime.fromtimestamp(birth_ts / 1000, tz=timezone.utc)
-                      .strftime('%Y-%m-%d'))
-        assert birth_date == "1999-12-10"
+        user_data = response.json[0]
+        assert user_data["first_name"] == "lucas"
+        assert user_data["last_name"] == "casa Mausa"
+        assert user_data["cpf"] == "809.561.830-69"
+        assert user_data["email"] == "teste1234@gmail.com"
+        assert user_data["birth_date"] == "1999-12-10T00:00:00Z"
 
-        response = client.get('/user/%s' % invalid_user["cpf"])
-        assert response.status_code == 400
-        assert b"User does not exist in database" in response.data
+        encoded_invalid_cpf = quote(invalid_user["cpf"])
+        response = client.get(f'/user/{encoded_invalid_cpf}')
+        assert response.status_code == 404

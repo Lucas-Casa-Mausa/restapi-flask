@@ -1,6 +1,7 @@
-from flask import jsonify, Response
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
+from datetime import datetime
 import re
 from .model import UserModel
 
@@ -75,15 +76,26 @@ class User(Resource):
             return {"message": "CPF is invalid"}, 400
 
         try:
-            response = UserModel(**data).save()
-            return {"message": "User %s successfully created!" % response.id}
+            data["birth_date"] = (
+                datetime.fromisoformat(
+                    data["birth_date"].replace('Z', '')
+                )
+            )
+
+            user = UserModel(**data).save()
+            return {
+                "message": f"User {user.id} successfully created!",
+                "id": str(user.id)
+            }, 201
 
         except NotUniqueError:
             return {"message": "CPF already exists in database"}, 400
+        except ValueError as e:
+            return {"message": f"Invalid date format: {str(e)}"}, 400
 
     def get(self, cpf):
-        qs = UserModel.objects(cpf=cpf)
-        if qs:
-            return Response(qs.to_json(), mimetype='application/json')
+        users = UserModel.objects(cpf=cpf)
+        if not users:
+            return {"message": "Usuário não encontrado"}, 404
 
-        return {"message": "User does not exist in database"}, 400
+        return jsonify([user.to_dict() for user in users])

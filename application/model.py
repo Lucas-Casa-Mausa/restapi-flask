@@ -7,3 +7,13 @@ class UserModel(db.Document):
     last_name = db.StringField(required=True)
     cpf = db.StringField(required=True, unique=True)
     birth_date = db.DateTimeField(required=True)
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "cpf": self.cpf,
+            "email": self.email,
+            "birth_date": self.birth_date.isoformat() + "Z"  # Formato ISO
+        }
