@@ -1,4 +1,5 @@
 import os
+import mongomock
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
@@ -35,7 +36,7 @@ class MockConfig:
     MONGODB_SETTINGS = {
         'db': 'users',
         'host': 'mongodb://localhost',
-        'mongo_client_class': 'mongomock.MongoClient',
+        'mongo_client_class': mongomock.MongoClient,
         'alias': 'default',
         'connect': False,
         'uuidRepresentation': 'standard'
