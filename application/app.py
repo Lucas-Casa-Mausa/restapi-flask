@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
 from datetime import datetime
 import re
-from .model import UserModel
+from .model import UserModel, HealthCheckModel
 from dateutil import parser as date_parser
 
 
@@ -33,6 +33,16 @@ _user_parser.add_argument('email',
                           required=True,
                           help='This Field cannot be blank'
                           )
+
+
+class HealthCheck(Resource):
+    def get(self):
+        response = HealthCheckModel.objects(status="healthcheck")
+        if response:
+            return "Healthy", 200
+        else:
+            HealthCheckModel(status="healthcheck").save()
+            return "Healthy", 200
 
 
 class Users(Resource):
