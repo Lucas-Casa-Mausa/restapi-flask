@@ -66,3 +66,24 @@ class TestApplication():
         encoded_invalid_cpf = quote(invalid_user["cpf"])
         response = client.get(f'/user/{encoded_invalid_cpf}')
         assert response.status_code == 404
+
+    def test_patch_user(self, client, valid_user):
+        resp = client.post('/user', json=valid_user)
+        assert resp.status_code == 201
+
+        valid_user["first_name"] = "Bill"
+        response = client.patch('/user', json=valid_user)
+        assert response.status_code == 200
+        assert b"updated" in response.data
+
+    def test_delete_user(self, client, valid_user,):
+        response_user = client.post('/user', json=valid_user)
+        assert response_user.status_code == 201
+
+        response = client.delete(f'/user/{valid_user["cpf"]}', json=valid_user)
+        assert response.status_code == 200
+        assert b"deleted" in response.data
+
+        response = client.delete(f'user/{valid_user["cpf"]}', json=valid_user)
+        assert response.status_code == 404
+        assert b"does not exist in database"

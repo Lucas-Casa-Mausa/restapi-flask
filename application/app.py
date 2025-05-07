@@ -4,6 +4,7 @@ from mongoengine import NotUniqueError
 from datetime import datetime
 import re
 from .model import UserModel
+from dateutil import parser as date_parser
 
 
 _user_parser = reqparse.RequestParser()
@@ -99,3 +100,46 @@ class User(Resource):
             return {"message": "Usuário não encontrado"}, 404
 
         return jsonify([user.to_dict() for user in users])
+
+    def patch(self):
+        data = _user_parser.parse_args()
+        cpf = data["cpf"]
+
+        response = UserModel.objects(cpf=cpf)
+        if not response:
+            return {"message": "User does not exists in database"}, 404
+
+        if not self.validate_cpf(cpf):
+            return {"message": "CPF is invalid"}, 400
+
+        update_data = {
+            k: v for k, v in data.items()
+            if k != "cpf" and v is not None
+        }
+
+        if "birth_date" in update_data:
+            try:
+                update_data["birth_date"] = date_parser.isoparse(
+                    update_data["birth_date"]
+                )
+            except (ValueError, TypeError):
+                return {"message": "Invalid birth_date format"}, 400
+
+        if not update_data:
+            return {"message": "No valid fields to update"}, 400
+
+        set_kwargs = {
+            f"set__{k}": v for k, v in update_data.items()
+        }
+        response.update(**set_kwargs)
+
+        return {"message": "User updated"}, 200
+
+    def delete(self, cpf):
+        response = UserModel.objects(cpf=cpf)
+
+        if response:
+            response.delete()
+            return {"message": "User deleted"}, 200
+        else:
+            return {"message": "User does not exists in database"}, 404
