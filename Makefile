@@ -4,6 +4,7 @@ APP = restapi
 # Remember to Install Flake8 at your venv
 
 test:
+	@black .
 	@flake8 . --exclude .venv
 	@pytest -v --disable-warnings
 
