@@ -15,5 +15,9 @@ class UserModel(db.Document):
             "last_name": self.last_name,
             "cpf": self.cpf,
             "email": self.email,
-            "birth_date": self.birth_date.isoformat() + "Z"  # Formato ISO
+            "birth_date": self.birth_date.isoformat() + "Z",  # Formato ISO
         }
+
+
+class HealthCheckModel(db.Document):
+    status = db.StringField(required=True)

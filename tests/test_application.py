@@ -4,11 +4,10 @@ from application.db import db
 from urllib.parse import quote
 
 
-class TestApplication():
-
+class TestApplication:
     @pytest.fixture
     def client(self):
-        app = create_app('config.MockConfig')
+        app = create_app("config.MockConfig")
         with app.app_context():
             database = db.get_db()
             for coll in database.list_collection_names():
@@ -22,8 +21,8 @@ class TestApplication():
             "last_name": "casa Mausa",
             "cpf": "809.561.830-69",
             "email": "teste1234@gmail.com",
-            "birth_date": "1999-12-10T00:00:00Z"
-                }
+            "birth_date": "1999-12-10T00:00:00Z",
+        }
 
     @pytest.fixture
     def invalid_user(self):
@@ -32,28 +31,28 @@ class TestApplication():
             "last_name": "casa Mausa",
             "cpf": "809.561.830-68",
             "email": "teste1234@gmail.com",
-            "birth_date": "1999-12-10T00:00:00Z"
-                }
+            "birth_date": "1999-12-10T00:00:00Z",
+        }
 
     def test_get_users(self, client):
-        response = client.get('/users')
+        response = client.get("/users")
         assert response.status_code == 200
 
     def test_post_user(self, client, valid_user, invalid_user):
-        response = client.post('/user', json=valid_user)
+        response = client.post("/user", json=valid_user)
         assert response.status_code == 201
         assert b"successfully" in response.data
 
-        response = client.post('/user', json=invalid_user)
+        response = client.post("/user", json=invalid_user)
         assert response.status_code == 400
         assert b"invalid" in response.data
 
     def test_get_user(self, client, valid_user, invalid_user):
-        post_resp = client.post('/user', json=valid_user)
+        post_resp = client.post("/user", json=valid_user)
         assert post_resp.status_code == 201
 
         encoded_cpf = quote(valid_user["cpf"])
-        response = client.get(f'/user/{encoded_cpf}')
+        response = client.get(f"/user/{encoded_cpf}")
         assert response.status_code == 200
 
         user_data = response.json[0]
@@ -64,5 +63,30 @@ class TestApplication():
         assert user_data["birth_date"] == "1999-12-10T00:00:00Z"
 
         encoded_invalid_cpf = quote(invalid_user["cpf"])
-        response = client.get(f'/user/{encoded_invalid_cpf}')
+        response = client.get(f"/user/{encoded_invalid_cpf}")
         assert response.status_code == 404
+
+    def test_patch_user(self, client, valid_user):
+        resp = client.post("/user", json=valid_user)
+        assert resp.status_code == 201
+
+        valid_user["first_name"] = "Bill"
+        response = client.patch("/user", json=valid_user)
+        assert response.status_code == 200
+        assert b"updated" in response.data
+
+    def test_delete_user(
+        self,
+        client,
+        valid_user,
+    ):
+        response_user = client.post("/user", json=valid_user)
+        assert response_user.status_code == 201
+
+        response = client.delete(f'/user/{valid_user["cpf"]}', json=valid_user)
+        assert response.status_code == 200
+        assert b"deleted" in response.data
+
+        response = client.delete(f'user/{valid_user["cpf"]}', json=valid_user)
+        assert response.status_code == 404
+        assert b"does not exist in database"
