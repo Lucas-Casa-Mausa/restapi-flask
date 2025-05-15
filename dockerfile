@@ -8,7 +8,7 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY application application
+COPY application/ application/
 COPY wsgi.py config.py ./
 
 CMD ["python3", "wsgi.py"]

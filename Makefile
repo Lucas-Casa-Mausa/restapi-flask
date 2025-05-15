@@ -1,4 +1,4 @@
-APP = restapi
+APP = restapi-flask
 
 
 # Remember to Install Flake8 at your venv
@@ -32,3 +32,11 @@ setup-dev:
 
 teardown-dev:
 	@kind delete clusters kind
+
+deploy-dev:
+	@docker build -t $(APP):latest .
+	@kind load docker-image restapi-flask:latest
+	@kubectl apply -f kubernetes/manifests
+	@kubectl rollout restart deploy restapi-flask
+
+dev: setup-dev deploy-dev
