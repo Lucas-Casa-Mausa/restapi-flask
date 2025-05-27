@@ -3,6 +3,7 @@
 Este projeto é uma API RESTful desenvolvida com Flask, estruturada para oferecer um backend sólido e escalável. Utiliza Docker para conteinerização, PostgreSQL como banco de dados relacional e inclui testes automatizados para garantir a qualidade do código.
 
 ## 🧱 Estrutura do Projeto
+```plaintext
 .
 ├── application/            # Código-fonte da aplicação Flask
 ├── tests/                  # Testes automatizados com pytest
@@ -15,8 +16,9 @@ Este projeto é uma API RESTful desenvolvida com Flask, estruturada para oferece
 ├── Makefile                # Comandos utilitários para automação
 ├── .flake8                 # Configurações do Flake8 para linting
 ├── conftest.py             # Configurações para os testes
-└── LICENSE  
-
+└── LICENSE                 # Licença MIT
+   └── LICENSE  
+```
 ## ⚙️ Tecnologias Utilizadas
 
 - **Flask**: Framework web leve e flexível para Python.
