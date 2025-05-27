@@ -38,27 +38,10 @@ Este projeto é uma API RESTful desenvolvida com Flask, estruturada para oferece
    cd restapi-flask
    
    Construa e inicie os containers:
-
-   Copiar
-   Editar
    docker-compose up --build
+
    Isso iniciará a aplicação Flask e o banco de dados PostgreSQL.
     
    Acesse a API:    
    A aplicação estará disponível em http://localhost:5000.
-    
-   🧪 Executando os Testes
-   Para rodar os testes automatizados:
-    
-   bash
-   Copiar
-   Editar
-   docker-compose exec web pytest
-   🧹 Linting do Código
-   Para verificar a qualidade do código com Flake8:
-    
-   bash
-   Copiar
-   Editar
-   docker-compose exec web flake8
 ```
